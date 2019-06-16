@@ -65,10 +65,12 @@ type Writer interface {
 	Write([]uint8)
 	WriteUInt8(uint8)
 	WriteUInt8A(uint8)
+	WriteUInt8C(uint8)
 	WriteUInt16(uint16)
 	WriteUInt16A(uint16)
 	WriteLEUInt16(uint16)
 	WriteLEUInt16A(uint16)
+	WriteUInt64(uint64)
 	WriteString(string, byte)
 }
 
@@ -91,21 +93,24 @@ func NewFixedWriter(size int) Writer {
 
 // Writes a byte onto the buffer
 func (a *FixedWriter) WriteUInt8(v uint8) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex] = v
 	a.currentIndex++
 }
 
 // Writes a byte onto the buffer but appends 128 to the value
 func (a *FixedWriter) WriteUInt8A(v uint8) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex] = v + 128
+	a.currentIndex++
+}
+
+// WriteUint8C Flips the byte value and writes it to the buffer
+func (a *FixedWriter) WriteUInt8C(v uint8) {
+	a.bytes[a.currentIndex] = -v
 	a.currentIndex++
 }
 
 // WriteUInt16 writes two bytes to the buffer
 func (a *FixedWriter) WriteUInt16(v uint16) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex] = byte(v >> 8)
 	a.bytes[a.currentIndex+1] = byte(v)
 	a.currentIndex += 2
@@ -113,7 +118,6 @@ func (a *FixedWriter) WriteUInt16(v uint16) {
 
 // WriteUInt16 writes two bytes to the buffer, but appends the second with 128
 func (a *FixedWriter) WriteUInt16A(v uint16) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex] = byte(v >> 8)
 	a.bytes[a.currentIndex+1] = byte(v + 128)
 	a.currentIndex += 2
@@ -121,7 +125,6 @@ func (a *FixedWriter) WriteUInt16A(v uint16) {
 
 // WriteUInt16 writes two bytes in little endian to the buffer
 func (a *FixedWriter) WriteLEUInt16(v uint16) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex+1] = byte(v >> 8)
 	a.bytes[a.currentIndex] = byte(v)
 	a.currentIndex += 2
@@ -129,10 +132,22 @@ func (a *FixedWriter) WriteLEUInt16(v uint16) {
 
 // WriteUInt16 writes two bytes in little endian to the buffer, but appends the second with 128
 func (a *FixedWriter) WriteLEUInt16A(v uint16) {
-	//defer lastResult.Inc(1)
 	a.bytes[a.currentIndex+1] = byte(v >> 8)
 	a.bytes[a.currentIndex] = byte(v + 128)
 	a.currentIndex += 2
+}
+
+// WriteUInt64 writes a int64 to the buffer in Big Endian order
+func (a *FixedWriter) WriteUInt64(v uint64) {
+	a.bytes[a.currentIndex] = byte(v >> 56)
+	a.bytes[a.currentIndex+1] = byte(v >> 48)
+	a.bytes[a.currentIndex+2] = byte(v >> 40)
+	a.bytes[a.currentIndex+3] = byte(v >> 32)
+	a.bytes[a.currentIndex+4] = byte(v >> 24)
+	a.bytes[a.currentIndex+5] = byte(v >> 16)
+	a.bytes[a.currentIndex+6] = byte(v >> 8)
+	a.bytes[a.currentIndex+7] = byte(v)
+	a.currentIndex += 8
 }
 
 // Write adds all the bytes to the payload
@@ -187,6 +202,12 @@ func (a *ExpandableWriter) WriteUInt8A(v uint8) {
 	a.currentIndex++
 }
 
+// WriteUint8C Flips the byte value and writes it to the buffer
+func (a *ExpandableWriter) WriteUInt8C(v uint8) {
+	a.bytes = append(a.bytes, -v)
+	a.currentIndex++
+}
+
 // WriteUInt16 writes two bytes to the buffer
 func (a *ExpandableWriter) WriteUInt16(v uint16) {
 	a.bytes = append(a.bytes, byte(v>>8), byte(v))
@@ -209,6 +230,16 @@ func (a *ExpandableWriter) WriteLEUInt16(v uint16) {
 func (a *ExpandableWriter) WriteLEUInt16A(v uint16) {
 	a.bytes = append(a.bytes, byte(v+128), byte(v>>8))
 	a.currentIndex += 2
+}
+
+// WriteUInt64 writes a int64 to the buffer in Big Endian order
+func (a *ExpandableWriter) WriteUInt64(v uint64) {
+	a.bytes = append(a.bytes,
+		byte(v >> 56), byte(v >> 48), byte(v >> 40),
+		byte(v >> 32), byte(v >> 24), byte(v >> 16),
+		byte(v >> 8), byte(v),
+	)
+	a.currentIndex += 8
 }
 
 // Write adds all the bytes to the payload
