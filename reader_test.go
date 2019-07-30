@@ -1,7 +1,7 @@
 package bytebuf
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -13,86 +13,76 @@ const (
 func TestReadString(t *testing.T) {
 	data := append([]byte(TestString), Delim)
 	reader := NewReader(data)
-	if value := reader.ReadString(Delim); value != TestString {
-		fmt.Printf("Did not decode string correctly, got %s\n", value)
-		t.FailNow()
-	}
+	assert.Equal(t, TestString, reader.ReadString(Delim))
 }
 func TestReadString2(t *testing.T) {
 	data := append([]byte(TestString), Delim)
 	data = append(data, data...)
 	reader := NewReader(data)
-	if value := reader.ReadString(Delim); value != TestString {
-		fmt.Printf("Did not decode string correctly, got %s\n", value)
-		t.FailNow()
-	}
-	if value := reader.ReadString(Delim); value != TestString {
-		fmt.Printf("Did not decode second string correctly, got %s\n", value)
-		t.FailNow()
-	}
+	assert.Equal(t, TestString, reader.ReadString(Delim))
+	assert.Equal(t, TestString, reader.ReadString(Delim))
 }
 func BenchmarkReadBuffer_ReadString(b *testing.B) {
-	data := append([]byte(TestString), Delim)
+	data := make([]byte, 0)
+	for n := 0; n < b.N; n++ {
+		data = append(data, []byte(TestString)...)
+		data = append(data, Delim)
+	}
 	reader := NewReader(data)
 	for i := 0; i < b.N; i++ {
 		_ = reader.ReadString(Delim)
-		reader.currentIndex = 0
 	}
 }
 
-func TestReadBuffer_ReadByteLE(t *testing.T) {
+func TestReadBuffer_ReadByte(t *testing.T) {
 	reader := NewReader([]byte{0x5, 0x8})
-	if reader.ReadUInt8() != 0x5 {
-		t.FailNow()
-	}
-	if reader.ReadUInt8() != 0x8 {
-		t.FailNow()
-	}
+	assert.Equal(t, uint8(0x5), reader.ReadUInt8())
+	assert.Equal(t, uint8(0x8), reader.ReadUInt8())
 }
-func BenchmarkReadBuffer_ReadByteLE(b *testing.B) {
-	reader := NewReader([]byte(TestString))
+func BenchmarkReadBuffer_ReadByte(b *testing.B) {
+	data := make([]byte,b.N)
+	for n := 0; n < b.N; n++ {
+		data = append(data, 5)
+	}
+	reader := NewReader(data)
 	for i := 0; i < b.N; i++ {
 		_ = reader.ReadUInt8()
-		reader.currentIndex = 0
 	}
 }
 
 func TestReadBuffer_ReadInt16LE(t *testing.T) {
 	reader := NewReader([]byte{0x12, 0x2E})
-	if v := reader.ReadLEUInt16(); v != 11794 {
-		fmt.Printf("Value: %d\n", v)
-		t.FailNow()
-	}
+	assert.Equal(t, uint16(11794), reader.ReadLEUInt16())
 }
 func BenchmarkReadBuffer_ReadInt16LE(b *testing.B) {
-	reader := NewReader([]byte(TestString))
+	data := make([]byte, 4 * b.N)
+	for n := 0; n < b.N; n++ {
+		data = append(data, 5, 6, 10, 5)
+	}
+	reader := NewReader(data)
 	for i := 0; i < b.N; i++ {
 		_ = reader.ReadLEUInt16()
-		reader.currentIndex = 0
 	}
 }
 
 func TestReadBuffer_ReadIntLE(t *testing.T) {
 	reader := NewReader([]byte{0xDB, 0xAC, 0xCD, 0xB})
-	if v := reader.ReadLEUInt32(); v != 198028507 {
-		fmt.Printf("Value: %d\n", v)
-		t.FailNow()
-	}
+	assert.Equal(t, uint32(198028507), reader.ReadLEUInt32())
 }
 func BenchmarkReadBuffer_ReadIntLE(b *testing.B) {
-	reader := NewReader([]byte(TestString))
+	data := make([]byte, 4 * b.N)
+	for n := 0; n < b.N; n++ {
+		data = append(data, 5, 6, 10, 5)
+	}
+	reader := NewReader(data)
 	for i := 0; i < b.N; i++ {
 		_ = reader.ReadLEUInt32()
-		reader.currentIndex = 0
 	}
 }
 
 func TestReadBuffer_ReadInt64LE(t *testing.T) {
 	reader := NewReader([]byte{0xCA, 0xBD, 0xFD, 0xCF, 0xCA, 0xBD, 0xCA, 0x3D})
-	if v := reader.ReadLEUInt64(); v != 4452579860379712970 {
-		fmt.Printf("Value: %d\n", v)
-		t.FailNow()
-	}
+	assert.Equal(t, uint64(4452579860379712970), reader.ReadLEUInt64())
 }
 func BenchmarkReadBuffer_ReadInt64LE(b *testing.B) {
 	reader := NewReader([]byte(TestString))
@@ -108,24 +98,9 @@ func TestArrayReader_ReadBits(t *testing.T) {
 	}
 	in := NewReader(data)
 	r := in.ReadBits()
-	if a := r(1); a != 1 {
-		fmt.Println("bit 1: ", a)
-		t.Fail()
-	}
-	if a := r(2); a != 1 {
-		fmt.Println("Bit 3", a)
-		t.Fail()
-	}
-	if a := r(5); a != 1 {
-		fmt.Println("Bit 8:", a)
-		t.Fail()
-	}
-	if a := r(1); a != 1 {
-		fmt.Println("bit 9: ", a)
-		t.Fail()
-	}
-	if a := r(15); a != 3 {
-		fmt.Println("bit 24: ", a)
-		t.Fail()
-	}
+	assert.Equal(t, uint(1), r(1))
+	assert.Equal(t, uint(1), r(2))
+	assert.Equal(t, uint(1), r(5))
+	assert.Equal(t, uint(1), r(1))
+	assert.Equal(t, uint(3), r(15))
 }

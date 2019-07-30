@@ -1,6 +1,7 @@
 package bytebuf
 
 import (
+	"bytes"
 	"encoding/binary"
 	"io"
 )
@@ -58,7 +59,7 @@ func (b *Reader) ReadLEUInt32() uint32 {
 }
 
 // Reads a twos byte off the array and increments the index pointer
-func (b *Reader) ReadUInt32() uint32 {
+func (b *Reader) ReadInt32() uint32 {
 	b.currentIndex += 4
 	return binary.BigEndian.Uint32(b.bytes[b.currentIndex-4 : b.currentIndex])
 }
@@ -82,12 +83,11 @@ func (b *Reader) Remaining() int {
 
 // Continuously reads bytes until the deliminiter character is read.
 func (b *Reader) ReadString(delim byte) string {
-	cur := b.currentIndex
-	for ; b.currentIndex < len(b.bytes); b.currentIndex++ {
-		if b.bytes[b.currentIndex] == delim {
-			b.currentIndex++
-			return string(b.bytes[cur : b.currentIndex-1])
-		}
+	if index := bytes.IndexByte(b.bytes[b.currentIndex:], delim); index > 0 {
+		end := index + b.currentIndex
+		data := b.bytes[b.currentIndex:end]
+		b.currentIndex = end + 1
+		return string(data)
 	}
 	return ""
 }

@@ -175,119 +175,18 @@ func BenchmarkExpandableWriter_WriteUInt82(b *testing.B) {
 	}
 }
 
-func TestFixedWriter_WriteUInt8A(t *testing.T) {
-	out := NewFixedWriter(1)
-	out.WriteUInt8A(2)
-
-	if out.Payload()[0] != 130 {
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt8A(t *testing.T) {
-	out := NewExpandableWriterWithCap(1)
-	out.WriteUInt8A(2)
-
-	if out.Size() != 1 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 130 {
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt8A2(t *testing.T) {
-	out := NewExpandableWriter()
-	out.WriteUInt8A(2)
-
-	if out.Size() != 1 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 130 {
-		t.FailNow()
-	}
-}
-func BenchmarkFixedWriter_WriteUInt8A(b *testing.B) {
-	out := NewFixedWriter(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8A(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt8A(b *testing.B) {
-	out := NewExpandableWriterWithCap(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8A(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt8A2(b *testing.B) {
-	out := NewExpandableWriter()
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8A(2)
-	}
-}
-
-func TestFixedWriter_WriteUInt8C(t *testing.T) {
-	out := NewFixedWriter(1)
-	out.WriteUInt8C(2)
-
-	if out.Payload()[0] != 254 {
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt8C(t *testing.T) {
-	out := NewExpandableWriterWithCap(1)
-	out.WriteUInt8C(2)
-
-	if out.Size() != 1 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 254 {
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt8C2(t *testing.T) {
-	out := NewExpandableWriter()
-	out.WriteUInt8C(2)
-
-	if out.Size() != 1 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 254 {
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func BenchmarkFixedWriter_WriteUInt8C(b *testing.B) {
-	out := NewFixedWriter(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8C(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt8C(b *testing.B) {
-	out := NewExpandableWriterWithCap(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8C(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt8C2(b *testing.B) {
-	out := NewExpandableWriter()
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt8C(2)
-	}
-}
-
-func TestFixedWriter_WriteUInt16(t *testing.T) {
+func TestFixedWriter_WriteInt16(t *testing.T) {
 	out := NewFixedWriter(2)
-	out.WriteUInt16(512)
+	out.WriteInt16(512)
 
 	if out.Payload()[0] != 2 && out.Payload()[1] != 0{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteUInt16(t *testing.T) {
+func TestExpandableWriter_WriteInt16(t *testing.T) {
 	out := NewExpandableWriterWithCap(2)
-	out.WriteUInt16(512)
+	out.WriteInt16(512)
 
 	if out.Size() != 2 {
 		t.FailNow()
@@ -297,9 +196,9 @@ func TestExpandableWriter_WriteUInt16(t *testing.T) {
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteUInt162(t *testing.T) {
+func TestExpandableWriter_WriteInt162(t *testing.T) {
 	out := NewExpandableWriter()
-	out.WriteUInt16(512)
+	out.WriteInt16(512)
 
 	if out.Size() != 2 {
 		t.FailNow()
@@ -309,89 +208,37 @@ func TestExpandableWriter_WriteUInt162(t *testing.T) {
 		t.FailNow()
 	}
 }
-func BenchmarkFixedWriter_WriteUInt16(b *testing.B) {
+func BenchmarkFixedWriter_WriteInt16(b *testing.B) {
 	out := NewFixedWriter(b.N * 2)
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt16(2)
+		out.WriteInt16(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteUInt16(b *testing.B) {
+func BenchmarkExpandableWriter_WriteInt16(b *testing.B) {
 	out := NewExpandableWriterWithCap(b.N * 2)
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt16(2)
+		out.WriteInt16(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteUInt162(b *testing.B) {
+func BenchmarkExpandableWriter_WriteInt162(b *testing.B) {
 	out := NewExpandableWriter()
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt16(2)
+		out.WriteInt16(2)
 	}
 }
 
-func TestFixedWriter_WriteUInt16A(t *testing.T) {
+func TestFixedWriter_WriteLEInt16(t *testing.T) {
 	out := NewFixedWriter(2)
-	out.WriteUInt16A(512)
-
-	if out.Payload()[0] != 2 && out.Payload()[1] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt16A(t *testing.T) {
-	out := NewExpandableWriterWithCap(2)
-	out.WriteUInt16A(512)
-
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 2 && out.Payload()[1] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func TestExpandableWriter_WriteUInt16A2(t *testing.T) {
-	out := NewExpandableWriter()
-	out.WriteUInt16A(512)
-
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 2 && out.Payload()[1] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
-}
-func BenchmarkFixedWriter_WriteUInt16A(b *testing.B) {
-	out := NewFixedWriter(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt16A(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt16A(b *testing.B) {
-	out := NewExpandableWriterWithCap(b.N)
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt16A(2)
-	}
-}
-func BenchmarkExpandableWriter_WriteUInt16A2(b *testing.B) {
-	out := NewExpandableWriter()
-	for i := 0; i < b.N; i++ {
-		out.WriteUInt16A(2)
-	}
-}
-
-func TestFixedWriter_WriteLEUInt16(t *testing.T) {
-	out := NewFixedWriter(2)
-	out.WriteLEUInt16(512)
+	out.WriteLEInt16(512)
 
 	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteLEUInt16(t *testing.T) {
+func TestExpandableWriter_WriteLEInt16(t *testing.T) {
 	out := NewExpandableWriterWithCap(2)
-	out.WriteLEUInt16(512)
+	out.WriteLEInt16(512)
 
 	if out.Size() != 2 {
 		t.FailNow()
@@ -401,9 +248,9 @@ func TestExpandableWriter_WriteLEUInt16(t *testing.T) {
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteLEUInt162(t *testing.T) {
+func TestExpandableWriter_WriteLEInt162(t *testing.T) {
 	out := NewExpandableWriter()
-	out.WriteLEUInt16(512)
+	out.WriteLEInt16(512)
 
 	if out.Size() != 2 {
 		t.FailNow()
@@ -413,120 +260,218 @@ func TestExpandableWriter_WriteLEUInt162(t *testing.T) {
 		t.FailNow()
 	}
 }
-func BenchmarkFixedWriter_WriteLEUInt16(b *testing.B) {
+func BenchmarkFixedWriter_WriteLEInt16(b *testing.B) {
 	out := NewFixedWriter(b.N * 2)
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16(2)
+		out.WriteLEInt16(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteLeUInt16(b *testing.B) {
+func BenchmarkExpandableWriter_WriteLeInt16(b *testing.B) {
 	out := NewExpandableWriterWithCap(b.N * 2)
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16(2)
+		out.WriteLEInt16(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteLEUInt162(b *testing.B) {
+func BenchmarkExpandableWriter_WriteLEInt162(b *testing.B) {
 	out := NewExpandableWriter()
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16(2)
+		out.WriteLEInt16(2)
 	}
 }
 
-func TestFixedWriter_WriteLEUInt16A(t *testing.T) {
-	out := NewFixedWriter(2)
-	out.WriteLEUInt16A(512)
+func TestFixedWriter_WriteInt32(t *testing.T) {
+	out := NewFixedWriter(4)
+	out.WriteInt32(512)
 
-	if out.Payload()[1] != 2 && out.Payload()[0] != 128{
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteLEUInt16A(t *testing.T) {
-	out := NewExpandableWriterWithCap(2)
-	out.WriteLEUInt16A(512)
+func TestExpandableWriter_WriteInt32(t *testing.T) {
+	out := NewExpandableWriterWithCap(4)
+	out.WriteInt32(512)
 
-	if out.Size() != 2 {
+	if out.Size() != 4 {
 		t.FailNow()
 	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 128{
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteLEUInt16A2(t *testing.T) {
+func TestExpandableWriter_WriteInt322(t *testing.T) {
 	out := NewExpandableWriter()
-	out.WriteLEUInt16A(512)
+	out.WriteInt32(512)
 
-	if out.Size() != 2 {
+	if out.Size() != 4 {
 		t.FailNow()
 	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 128{
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func BenchmarkFixedWriter_WriteLEUInt16A(b *testing.B) {
-	out := NewFixedWriter(b.N * 2)
+func BenchmarkFixedWriter_WriteInt32(b *testing.B) {
+	out := NewFixedWriter(b.N * 4)
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16A(2)
+		out.WriteInt32(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteLEUInt16A(b *testing.B) {
-	out := NewExpandableWriterWithCap(b.N * 2)
+func BenchmarkExpandableWriter_WriteInt32(b *testing.B) {
+	out := NewExpandableWriterWithCap(b.N * 4)
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16A(2)
+		out.WriteInt32(2)
 	}
 }
-func BenchmarkExpandableWriter_WriteLEUInt16A2(b *testing.B) {
+func BenchmarkExpandableWriter_WriteInt322(b *testing.B) {
 	out := NewExpandableWriter()
 	for i := 0; i < b.N; i++ {
-		out.WriteLEUInt16A(2)
+		out.WriteInt32(2)
 	}
 }
 
-func TestFixedWriter_WriteUInt32(t *testing.T) {
+func TestFixedWriter_WriteLEInt32(t *testing.T) {
+	out := NewFixedWriter(4)
+	out.WriteLEInt32(512)
+
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func TestExpandableWriter_WriteLEInt32(t *testing.T) {
+	out := NewExpandableWriterWithCap(4)
+	out.WriteLEInt32(512)
+
+	if out.Size() != 4 {
+		t.FailNow()
+	}
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func TestExpandableWriter_WriteLEInt322(t *testing.T) {
+	out := NewExpandableWriter()
+	out.WriteLEInt32(512)
+
+	if out.Size() != 4 {
+		t.FailNow()
+	}
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func BenchmarkFixedWriter_WriteLEInt32(b *testing.B) {
+	out := NewFixedWriter(b.N * 4)
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt32(2)
+	}
+}
+func BenchmarkExpandableWriter_WriteLEInt32(b *testing.B) {
+	out := NewExpandableWriterWithCap(b.N * 4)
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt32(2)
+	}
+}
+func BenchmarkExpandableWriter_WriteLEInt322(b *testing.B) {
+	out := NewExpandableWriter()
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt32(2)
+	}
+}
+
+func TestFixedWriter_WriteInt64(t *testing.T) {
 	out := NewFixedWriter(8)
-	out.WriteUInt64(144115188075856000)
+	out.WriteInt64(144115188075856000)
 
 	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteUInt64(t *testing.T) {
+func TestExpandableWriter_WriteInt64(t *testing.T) {
 	out := NewExpandableWriterWithCap(8)
-	out.WriteUInt64(144115188075856000)
+	out.WriteInt64(144115188075856000)
 
 	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func TestExpandableWriter_WriteUInt642(t *testing.T) {
+func TestExpandableWriter_WriteInt642(t *testing.T) {
 	out := NewExpandableWriter()
-	out.WriteUInt64(144115188075856000)
+	out.WriteInt64(144115188075856000)
 
 	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
 }
-func BenchmarkFixedWriter_WriteUInt64(b *testing.B) {
+func BenchmarkFixedWriter_WriteInt64(b *testing.B) {
 	out := NewFixedWriter(b.N * 8)
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt64(144115188075856000)
+		out.WriteInt64(144115188075856000)
 	}
 }
-func BenchmarkExpandableWriter_WriteUInt64(b *testing.B) {
+func BenchmarkExpandableWriter_WriteInt64(b *testing.B) {
 	out := NewExpandableWriterWithCap(b.N * 8)
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt64(144115188075856000)
+		out.WriteInt64(144115188075856000)
 	}
 }
-func BenchmarkExpandableWriter_WriteUInt642(b *testing.B) {
+func BenchmarkExpandableWriter_WriteInt642(b *testing.B) {
 	out := NewExpandableWriter()
 	for i := 0; i < b.N; i++ {
-		out.WriteUInt64(144115188075856000)
+		out.WriteInt64(144115188075856000)
+	}
+}
+
+func TestFixedWriter_WriteLELEInt64(t *testing.T) {
+	out := NewFixedWriter(8)
+	out.WriteLEInt64(144115188075856000)
+
+	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func TestExpandableWriter_WriteLEInt64(t *testing.T) {
+	out := NewExpandableWriterWithCap(8)
+	out.WriteLEInt64(144115188075856000)
+
+	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func TestExpandableWriter_WriteLEInt642(t *testing.T) {
+	out := NewExpandableWriter()
+	out.WriteLEInt64(144115188075856000)
+
+	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
+		fmt.Println(out.Payload())
+		t.FailNow()
+	}
+}
+func BenchmarkFixedWriter_WriteLEInt64(b *testing.B) {
+	out := NewFixedWriter(b.N * 8)
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt64(144115188075856000)
+	}
+}
+func BenchmarkExpandableWriter_WriteLEInt64(b *testing.B) {
+	out := NewExpandableWriterWithCap(b.N * 8)
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt64(144115188075856000)
+	}
+}
+func BenchmarkExpandableWriter_WriteLEInt642(b *testing.B) {
+	out := NewExpandableWriter()
+	for i := 0; i < b.N; i++ {
+		out.WriteLEInt64(144115188075856000)
 	}
 }
 
