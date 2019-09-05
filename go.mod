@@ -1,4 +1,4 @@
-module github.com/Pwalne/bytebuf
+module github.com/Pwalne/bytepal
 
 require github.com/stretchr/testify v1.3.0
 
