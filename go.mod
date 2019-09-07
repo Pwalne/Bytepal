@@ -1,4 +1,4 @@
-module bytepal
+module github.com/Pwalne/bytepal
 
 go 1.13
 
