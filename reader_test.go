@@ -1,4 +1,4 @@
-package bytebuf
+package bytepal
 
 import (
 	"github.com/stretchr/testify/assert"
