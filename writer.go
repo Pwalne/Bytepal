@@ -42,7 +42,7 @@ func (a *bitWriter) BitAccess() func(uint, uint) {
 		// Check if numBits is greater than int8, if so write value and continue.
 		for ; numBits > bitOffset; bitOffset = 8 {
 			a.bytes[bytePos] &= ^byte(bitMask[bitOffset])
-			a.bytes[bytePos] |= byte((value >> (numBits - bitOffset)) & bitMask[numBits])
+			a.bytes[bytePos] |= byte((value >> (numBits - bitOffset)) & bitMask[bitOffset])
 			bytePos++
 			numBits -= bitOffset
 		}

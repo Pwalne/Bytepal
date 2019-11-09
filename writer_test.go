@@ -2,38 +2,24 @@ package bytepal
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func testBitAccess(t *testing.T, out Writer, expected ...int) {
 	fun := out.BitAccess()
 	fun(1, 1)
-	if out.Size() != expected[0] {
-		fmt.Printf("Incorrect payload size. Should be %d, got %d\n", expected[0], out.Size())
-		t.Fail()
-	}
+	assert.Equal(t, expected[0], out.Size())
 	fun(2, 1)
 	fun(5, 1)
-	if (out.Payload())[0] != 161 {
-		t.Fail()
-	}
-	if out.Size() != expected[1] {
-		fmt.Printf("Incorrect payload size. Should be %d, got %d\n", expected[1], out.Size())
-		t.Fail()
-	}
+	assert.Equal(t, byte(161), out.Payload()[0])
+	assert.Equal(t, expected[1], out.Size())
 	fun(1, 1)
-	if (out.Payload())[1] != 128 {
-		t.Fail()
-	}
-	if out.Size() != expected[2] {
-		fmt.Printf("Incorrect payload size. Should be %d, got %d\n", expected[2], out.Size())
-		t.Fail()
-	}
+	assert.Equal(t, byte(128), out.Payload()[1])
+	assert.Equal(t, expected[2], out.Size())
 	fun(15, 3)
-	if out.Size() != expected[3] {
-		fmt.Printf("Incorrect payload size. Should be %d, got %d\n", expected[3], out.Size())
-		t.Fail()
-	}
+	assert.Equal(t, expected[3], out.Size())
 }
 
 func TestBitWriter_BitAccess2(t *testing.T) {
@@ -54,31 +40,39 @@ func TestBitWriter_BitAccessAndWrite(t *testing.T) {
 	bits(1, 0)
 	bits(8, 0)
 	bits(11, 2047)
-	if out.Size() != 3 {
-		fmt.Println("Incorrect buffer size of", out.Size())
-		t.FailNow()
-	}
+	assert.Len(t, out.Payload(), 3)
 	out.Write([]byte{0})
-	if out.Size() != 4 {
-		fmt.Println("Incorrect buffer size of", out.Size())
-		t.FailNow()
-	}
+	assert.Len(t, out.Payload(), 4)
+}
+
+func TestBitWriter_BitAccessAndWrite2(t *testing.T) {
+	out := NewExpandableWriterWithCap(0)
+	bits := out.BitAccess()
+	bits(11, 1)
+	bits(1, 1)
+	bits(1, 1)
+	v := -2
+	bits(5, uint(v))
+	bits(5, 2)
+	assert.Equal(t, 3, out.Size())
+
+	in := NewReader(out.Payload())
+	b := in.ReadBits()
+	assert.Equal(t, uint(1), b(11))
+	assert.Equal(t, uint(1), b(1))
+	assert.Equal(t, uint(1), b(1))
+	assert.Equal(t, uint(30), b(5))
+	assert.Equal(t, uint(2), b(5))
 }
 
 func TestFixedWriter_Write(t *testing.T) {
 	out := NewFixedWriter(4)
 	test := []byte{0, 1, 0, 1}
 	out.Write(test)
-
-	if out.Size() != len(test) {
-		fmt.Printf("Incorrect payload size: Got %d, expected %d\n", out.Size(), len(test))
-	}
+	assert.Len(t, out.Payload(), len(test))
 
 	for i := range test {
-		if test[i] != out.Payload()[i] {
-			fmt.Printf("Got %d Expected %d.\n", out.Payload()[i], test[i])
-			t.FailNow()
-		}
+		assert.Equal(t, test[i], out.Payload()[i])
 	}
 }
 func TestExpandableWriter_Write(t *testing.T) {
@@ -86,15 +80,10 @@ func TestExpandableWriter_Write(t *testing.T) {
 	test := []byte{0, 1, 0, 1}
 	out.Write(test)
 
-	if out.Size() != len(test) {
-		fmt.Printf("Incorrect payload size: Got %d, expected %d\n", out.Size(), len(test))
-	}
+	assert.Len(t, out.Payload(), len(test))
 
 	for i := range test {
-		if test[i] != out.Payload()[i] {
-			fmt.Printf("Got %d Expected %d.\n", out.Payload()[i], test[i])
-			t.FailNow()
-		}
+		assert.Equal(t, test[i], out.Payload()[i])
 	}
 }
 func TestExpandableWriter_Write2(t *testing.T) {
@@ -102,15 +91,10 @@ func TestExpandableWriter_Write2(t *testing.T) {
 	test := []byte{0, 1, 0, 1}
 	out.Write(test)
 
-	if out.Size() != len(test) {
-		fmt.Printf("Incorrect payload size: Got %d, expected %d\n", out.Size(), len(test))
-	}
+	assert.Len(t, out.Payload(), len(test))
 
 	for i := range test {
-		if test[i] != out.Payload()[i] {
-			fmt.Printf("Got %d Expected %d.\n", out.Payload()[i], test[i])
-			t.FailNow()
-		}
+		assert.Equal(t, test[i], out.Payload()[i])
 	}
 }
 func BenchmarkFixedWriter_Write(b *testing.B) {
@@ -138,23 +122,17 @@ func BenchmarkExpandableWriter_Write2(b *testing.B) {
 func TestFixedWriter_WriteUInt8(t *testing.T) {
 	out := NewFixedWriter(1)
 	out.WriteUInt8(1)
-	if out.Payload()[0] != 1 {
-		t.FailNow()
-	}
+	assert.Equal(t, byte(1), out.Payload()[0])
 }
 func TestExpandableWriter_WriteUInt8(t *testing.T) {
 	out := NewExpandableWriterWithCap(1)
 	out.WriteUInt8(1)
-	if out.Payload()[0] != 1 {
-		t.FailNow()
-	}
+	assert.Equal(t, byte(1), out.Payload()[0])
 }
 func TestExpandableWriter_WriteUInt82(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteUInt8(1)
-	if out.Payload()[0] != 1 {
-		t.FailNow()
-	}
+	assert.Equal(t, byte(1), out.Payload()[0])
 }
 func BenchmarkFixedWriter_WriteUInt8(b *testing.B) {
 	out := NewFixedWriter(b.N)
@@ -179,34 +157,24 @@ func TestFixedWriter_WriteInt16(t *testing.T) {
 	out := NewFixedWriter(2)
 	out.WriteInt16(512)
 
-	if out.Payload()[0] != 2 && out.Payload()[1] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(0), out.Payload()[1])
 }
 func TestExpandableWriter_WriteInt16(t *testing.T) {
 	out := NewExpandableWriterWithCap(2)
 	out.WriteInt16(512)
 
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 2 && out.Payload()[1] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 2)
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(0), out.Payload()[1])
 }
 func TestExpandableWriter_WriteInt162(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteInt16(512)
 
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[0] != 2 && out.Payload()[1] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 2)
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(0), out.Payload()[1])
 }
 func BenchmarkFixedWriter_WriteInt16(b *testing.B) {
 	out := NewFixedWriter(b.N * 2)
@@ -231,7 +199,8 @@ func TestFixedWriter_WriteLEInt16(t *testing.T) {
 	out := NewFixedWriter(2)
 	out.WriteLEInt16(512)
 
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
+
+	if out.Payload()[1] != 2 && out.Payload()[0] != 0 {
 		fmt.Println(out.Payload())
 		t.FailNow()
 	}
@@ -240,25 +209,17 @@ func TestExpandableWriter_WriteLEInt16(t *testing.T) {
 	out := NewExpandableWriterWithCap(2)
 	out.WriteLEInt16(512)
 
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 2)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[1])
 }
 func TestExpandableWriter_WriteLEInt162(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteLEInt16(512)
 
-	if out.Size() != 2 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 2)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[1])
 }
 func BenchmarkFixedWriter_WriteLEInt16(b *testing.B) {
 	out := NewFixedWriter(b.N * 2)
@@ -283,34 +244,25 @@ func TestFixedWriter_WriteInt32(t *testing.T) {
 	out := NewFixedWriter(4)
 	out.WriteInt32(512)
 
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[2])
 }
 func TestExpandableWriter_WriteInt32(t *testing.T) {
 	out := NewExpandableWriterWithCap(4)
 	out.WriteInt32(512)
 
-	if out.Size() != 4 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[2])
 }
 func TestExpandableWriter_WriteInt322(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteInt32(512)
 
-	if out.Size() != 4 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[2])
 }
 func BenchmarkFixedWriter_WriteInt32(b *testing.B) {
 	out := NewFixedWriter(b.N * 4)
@@ -335,34 +287,25 @@ func TestFixedWriter_WriteLEInt32(t *testing.T) {
 	out := NewFixedWriter(4)
 	out.WriteLEInt32(512)
 
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[1])
 }
 func TestExpandableWriter_WriteLEInt32(t *testing.T) {
 	out := NewExpandableWriterWithCap(4)
 	out.WriteLEInt32(512)
 
-	if out.Size() != 4 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[1])
 }
 func TestExpandableWriter_WriteLEInt322(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteLEInt32(512)
 
-	if out.Size() != 4 {
-		t.FailNow()
-	}
-	if out.Payload()[1] != 2 && out.Payload()[0] != 0{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	require.Len(t, out.Payload(), 4)
+	assert.Equal(t, byte(0), out.Payload()[0])
+	assert.Equal(t, byte(2), out.Payload()[1])
 }
 func BenchmarkFixedWriter_WriteLEInt32(b *testing.B) {
 	out := NewFixedWriter(b.N * 4)
@@ -387,28 +330,22 @@ func TestFixedWriter_WriteInt64(t *testing.T) {
 	out := NewFixedWriter(8)
 	out.WriteInt64(144115188075856000)
 
-	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(128), out.Payload()[7])
 }
 func TestExpandableWriter_WriteInt64(t *testing.T) {
 	out := NewExpandableWriterWithCap(8)
 	out.WriteInt64(144115188075856000)
 
-	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(128), out.Payload()[7])
 }
 func TestExpandableWriter_WriteInt642(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteInt64(144115188075856000)
 
-	if out.Payload()[0] != 2 && out.Payload()[7] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[0])
+	assert.Equal(t, byte(128), out.Payload()[7])
 }
 func BenchmarkFixedWriter_WriteInt64(b *testing.B) {
 	out := NewFixedWriter(b.N * 8)
@@ -433,28 +370,22 @@ func TestFixedWriter_WriteLELEInt64(t *testing.T) {
 	out := NewFixedWriter(8)
 	out.WriteLEInt64(144115188075856000)
 
-	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[7])
+	assert.Equal(t, byte(128), out.Payload()[0])
 }
 func TestExpandableWriter_WriteLEInt64(t *testing.T) {
 	out := NewExpandableWriterWithCap(8)
 	out.WriteLEInt64(144115188075856000)
 
-	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[7])
+	assert.Equal(t, byte(128), out.Payload()[0])
 }
 func TestExpandableWriter_WriteLEInt642(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteLEInt64(144115188075856000)
 
-	if out.Payload()[7] != 2 && out.Payload()[0] != 128{
-		fmt.Println(out.Payload())
-		t.FailNow()
-	}
+	assert.Equal(t, byte(2), out.Payload()[7])
+	assert.Equal(t, byte(128), out.Payload()[0])
 }
 func BenchmarkFixedWriter_WriteLEInt64(b *testing.B) {
 	out := NewFixedWriter(b.N * 8)
@@ -478,53 +409,32 @@ func BenchmarkExpandableWriter_WriteLEInt642(b *testing.B) {
 func TestFixedWriter_WriteString(t *testing.T) {
 	out := NewFixedWriter(len(TestString) + 1)
 	out.WriteString(TestString, Delim)
-	if out.Size() != len(TestString)+1 {
-		fmt.Printf("Size: %d Expected :%d\n", out.Size(), len(TestString)+1)
-		t.Fail()
-	}
+	require.Len(t, out.Payload(), len(TestString) + 1)
 }
 func TestExpandableWriter_WriteString(t *testing.T) {
 	out := NewExpandableWriterWithCap(len(TestString) + 1)
 	out.WriteString(TestString, Delim)
-	if out.Size() != len(TestString)+1 {
-		fmt.Printf("Size: %d Expected :%d\n", out.Size(), len(TestString)+1)
-		t.Fail()
-	}
+	require.Len(t, out.Payload(), len(TestString) + 1)
 
 	out2 := NewExpandableWriterWithCap(len(TestString) + 1)
 	out2.WriteString(TestString, Delim)
-	if out2.Size() != len(TestString)+1 {
-		fmt.Printf("Size: %d Expected :%d\n", out2.Size(), len(TestString)+1)
-		t.Fail()
-	}
+	require.Len(t, out2.Payload(), len(TestString) + 1)
 
 	for i := range out.Payload() {
-		if out.Payload()[i] != out2.Payload()[i] {
-			fmt.Printf("Array [%s] != [%s]", string(out.Payload()), string(out2.Payload()))
-			t.FailNow()
-		}
+		assert.Equal(t, out.Payload()[i], out2.Payload()[i])
 	}
 }
 func TestExpandableWriter_WriteString2(t *testing.T) {
 	out := NewExpandableWriter()
 	out.WriteString(TestString, Delim)
-	if out.Size() != len(TestString)+1 {
-		fmt.Printf("Size: %d Expected :%d\n", out.Size(), len(TestString)+1)
-		t.Fail()
-	}
+	require.Len(t, out.Payload(), len(TestString) + 1)
 
 	out2 := NewExpandableWriterWithCap(len(TestString) + 1)
 	out2.WriteString(TestString, Delim)
-	if out2.Size() != len(TestString)+1 {
-		fmt.Printf("Size: %d Expected :%d\n", out2.Size(), len(TestString)+1)
-		t.Fail()
-	}
+	require.Len(t, out2.Payload(), len(TestString) + 1)
 
 	for i := range out.Payload() {
-		if out.Payload()[i] != out2.Payload()[i] {
-			fmt.Printf("Array [%s] != [%s]", string(out.Payload()), string(out2.Payload()))
-			t.FailNow()
-		}
+		assert.Equal(t, out.Payload()[i], out2.Payload()[i])
 	}
 }
 func BenchmarkFixedWriter_WriteString(b *testing.B) {
