@@ -40,6 +40,13 @@ func (b *Reader) ReadUInt8() uint8 {
 	return b.bytes[b.currentIndex-1]
 }
 
+// Read reads the given number of bytes and returns a slice of the payload containing those
+func (b *Reader) Read(size int) []byte {
+	data := b.bytes[b.currentIndex:b.currentIndex+size]
+	b.currentIndex += size
+	return data
+}
+
 // Reads a twos byte off the array and increments the index pointer
 func (b *Reader) ReadLEUInt16() uint16 {
 	b.currentIndex += 2

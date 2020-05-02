@@ -39,6 +39,18 @@ func TestReadBuffer_ReadByte(t *testing.T) {
 	assert.Equal(t, uint8(0x5), reader.ReadUInt8())
 	assert.Equal(t, uint8(0x8), reader.ReadUInt8())
 }
+
+func TestReader_Read(t *testing.T) {
+	reader := NewReader([]byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6})
+	payload1 := reader.Read(2)
+	assert.Len(t, payload1, 2)
+	assert.Equal(t, 4, reader.Remaining())
+
+	payload2 := reader.Read(4)
+	assert.Len(t, payload2, 4)
+	assert.Equal(t, 0, reader.Remaining())
+}
+
 func BenchmarkReadBuffer_ReadByte(b *testing.B) {
 	data := make([]byte,b.N)
 	for n := 0; n < b.N; n++ {
