@@ -42,11 +42,11 @@ func TestReadBuffer_ReadByte(t *testing.T) {
 
 func TestReader_Read(t *testing.T) {
 	reader := NewReader([]byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6})
-	payload1 := reader.Read(2)
+	payload1 := reader.ReadSlice(2)
 	assert.Len(t, payload1, 2)
 	assert.Equal(t, 4, reader.Remaining())
 
-	payload2 := reader.Read(4)
+	payload2 := reader.ReadSlice(4)
 	assert.Len(t, payload2, 4)
 	assert.Equal(t, 0, reader.Remaining())
 }

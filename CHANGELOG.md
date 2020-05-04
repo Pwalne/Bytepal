@@ -1,5 +1,9 @@
 # Library Changes
 
+## 0.1.4
+  * Added a readByte method to read into a given byte array.
+  * Renamed ReadInt to ReadUInt32
+
 ## 0.1.3
   * Reader now has  Read(size) func for reading a slice of the payload
 

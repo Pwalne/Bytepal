@@ -40,11 +40,18 @@ func (b *Reader) ReadUInt8() uint8 {
 	return b.bytes[b.currentIndex-1]
 }
 
-// Read reads the given number of bytes and returns a slice of the payload containing those
-func (b *Reader) Read(size int) []byte {
+// ReadSlice reads the given number of bytes and returns a slice of the payload containing those
+func (b *Reader) ReadSlice(size int) []byte {
 	data := b.bytes[b.currentIndex:b.currentIndex+size]
 	b.currentIndex += size
 	return data
+}
+
+func (b *Reader) ReadBytes(payload []byte) {
+	for i := range payload {
+		payload[i] = b.bytes[b.currentIndex+i]
+	}
+	b.currentIndex += len(payload)
 }
 
 // Reads a twos byte off the array and increments the index pointer
@@ -66,7 +73,7 @@ func (b *Reader) ReadLEUInt32() uint32 {
 }
 
 // Reads a twos byte off the array and increments the index pointer
-func (b *Reader) ReadInt32() uint32 {
+func (b *Reader) ReadUInt32() uint32 {
 	b.currentIndex += 4
 	return binary.BigEndian.Uint32(b.bytes[b.currentIndex-4 : b.currentIndex])
 }
