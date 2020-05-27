@@ -1,5 +1,8 @@
 # Library Changes
 
+## 0.1.5
+  * Added a Seek function for setting the index of the reader
+
 ## 0.1.4
   * Added a readByte method to read into a given byte array.
   * Renamed ReadInt to ReadUInt32

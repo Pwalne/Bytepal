@@ -33,6 +33,11 @@ func ReadBytes(reader io.Reader, size int) (*Reader, error) {
 	}, nil
 }
 
+// Seek sets the reading index to the desired position. NOTE: No out of bounds checks are performed.
+func (b *Reader) Seek(position int) {
+	b.currentIndex = position
+}
+
 // Reads a single byte off the array and increments the index pointer
 func (b *Reader) ReadUInt8() uint8 {
 	//defer lastResult.Inc(1)
