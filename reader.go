@@ -33,6 +33,11 @@ func ReadBytes(reader io.Reader, size int) (*Reader, error) {
 	}, nil
 }
 
+// Payload returns the underlying byte array
+func (b *Reader) Payload() []byte {
+	return b.bytes
+}
+
 // Seek sets the reading index to the desired position. NOTE: No out of bounds checks are performed.
 func (b *Reader) Seek(position int) {
 	b.currentIndex = position
@@ -69,6 +74,20 @@ func (b *Reader) ReadLEUInt16() uint16 {
 func (b *Reader) ReadUInt16() uint16 {
 	b.currentIndex += 2
 	return binary.BigEndian.Uint16(b.bytes[b.currentIndex-2 : b.currentIndex])
+}
+
+// ReadUMedium reads a 24bit unsigned value
+func (b *Reader) ReadUMedium() uint32 {
+	b.currentIndex += 3
+	return uint32(b.bytes[b.currentIndex-3]) << 16 | uint32(b.bytes[b.currentIndex-2]) << 8 | uint32(b.bytes[b.currentIndex-1])
+}
+
+// ReadBigSmart attempts to read either a short or int based on the next value.
+func (b *Reader) ReadBigSmart() uint32 {
+	if int8(b.bytes[b.currentIndex]) >= 0 {
+		return uint32(b.ReadUInt16())
+	}
+	return b.ReadUInt32()
 }
 
 // Reads a twos byte off the array and increments the index pointer

@@ -1,5 +1,10 @@
 # Library Changes
 
+## 0.1.7
+  * Added Payload function to reader
+  * Added ReadUMedium func to reader
+  * Added ReadBigSmart func to reader
+
 ## 0.1.5
   * Added a Seek function for setting the index of the reader
 
